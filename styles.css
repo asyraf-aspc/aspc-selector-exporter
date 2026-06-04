@@ -191,6 +191,43 @@ button:disabled {
   font-weight: 900;
 }
 
+.mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 46px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  padding: 3px;
+}
+
+.mode-tab {
+  min-width: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--eurostile);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mode-tab.is-active {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 1px 10px rgba(225, 37, 27, 0.28);
+}
+
+.mode-panel {
+  display: none;
+}
+
+.mode-panel.is-active {
+  display: block;
+}
+
 .drop-zone {
   position: relative;
   display: grid;
@@ -218,6 +255,10 @@ button:disabled {
     linear-gradient(135deg, rgba(225, 37, 27, 0.2), transparent 58%),
     #26282f;
   transform: translateY(-1px);
+}
+
+.drop-zone-compact {
+  min-height: 122px;
 }
 
 .drop-zone input {
@@ -262,6 +303,83 @@ button:disabled {
   min-height: 38px;
   margin: 10px 0 0;
   overflow-wrap: anywhere;
+}
+
+.mini-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  gap: 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #090a0d;
+  color: var(--muted);
+  padding: 0 10px;
+  font-family: var(--eurostile);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mini-action:hover {
+  border-color: var(--accent-hot);
+  color: #ffffff;
+}
+
+.mini-action svg {
+  width: 15px;
+  height: 15px;
+}
+
+.range-list {
+  display: grid;
+  gap: 12px;
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.range-row span,
+.range-row output,
+.toggle-row span {
+  font-family: var(--eurostile);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.range-row output {
+  color: var(--text);
+  text-align: right;
+}
+
+.range-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 42px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.toggle-row input {
+  width: 42px;
+  height: 22px;
+  accent-color: var(--accent);
 }
 
 .overlay-list {

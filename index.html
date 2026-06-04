@@ -33,39 +33,151 @@
         <aside class="control-panel" aria-label="Editor controls">
           <section class="panel-section">
             <div class="section-head">
-              <h2>Image</h2>
+              <h2>Mode</h2>
             </div>
-
-            <label class="drop-zone" id="dropZone">
-              <input
-                id="imageInput"
-                type="file"
-                accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
-              />
-              <span class="drop-icon" data-lucide="upload-cloud" aria-hidden="true"></span>
-              <span class="drop-title">Upload image</span>
-              <span class="drop-subtitle">PNG, JPEG, WebP</span>
-            </label>
-
-            <p class="file-meta" id="fileMeta">No image selected</p>
-          </section>
-
-          <section class="panel-section">
-            <div class="section-head">
-              <h2>Overlay</h2>
-            </div>
-            <div class="overlay-list" id="overlayList" aria-label="Overlay options"></div>
-          </section>
-
-          <section class="panel-section">
-            <div class="section-head">
-              <h2>Frame</h2>
-            </div>
-            <div class="segmented" role="group" aria-label="Image fit">
-              <button class="segment is-active" type="button" data-fit="cover">Crop fill</button>
-              <button class="segment" type="button" data-fit="contain">Fit full</button>
+            <div class="mode-tabs" role="tablist" aria-label="Workflow mode">
+              <button
+                class="mode-tab is-active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-mode="generate"
+              >
+                Generate Selector
+              </button>
+              <button
+                class="mode-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-mode="overlay"
+              >
+                Overlay Existing
+              </button>
             </div>
           </section>
+
+          <div class="mode-panel is-active" data-mode-panel="generate">
+            <section class="panel-section">
+              <div class="section-head">
+                <h2>Background</h2>
+              </div>
+
+              <label class="drop-zone drop-zone-compact" id="backgroundDropZone">
+                <input
+                  id="backgroundInput"
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                />
+                <span class="drop-icon" data-lucide="image-up" aria-hidden="true"></span>
+                <span class="drop-title">Upload background</span>
+                <span class="drop-subtitle">1080 x 1080 preferred</span>
+              </label>
+
+              <p class="file-meta" id="backgroundMeta">No background selected</p>
+            </section>
+
+            <section class="panel-section">
+              <div class="section-head">
+                <h2>Product Asset</h2>
+              </div>
+
+              <label class="drop-zone drop-zone-compact" id="productDropZone">
+                <input
+                  id="productInput"
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                />
+                <span class="drop-icon" data-lucide="monitor-up" aria-hidden="true"></span>
+                <span class="drop-title">Upload product</span>
+                <span class="drop-subtitle">Transparent PNG/WebP works best</span>
+              </label>
+
+              <p class="file-meta" id="productMeta">No product selected</p>
+            </section>
+
+            <section class="panel-section">
+              <div class="section-head">
+                <h2>Product Position</h2>
+                <button class="mini-action" id="resetProductBtn" type="button">
+                  <span data-lucide="crosshair" aria-hidden="true"></span>
+                  <span>Reset</span>
+                </button>
+              </div>
+
+              <div class="range-list">
+                <label class="range-row" for="productScale">
+                  <span>Scale</span>
+                  <input id="productScale" type="range" min="30" max="140" value="78" />
+                  <output id="productScaleValue" for="productScale">78%</output>
+                </label>
+                <label class="range-row" for="productX">
+                  <span>X</span>
+                  <input id="productX" type="range" min="-360" max="360" value="0" />
+                  <output id="productXValue" for="productX">0px</output>
+                </label>
+                <label class="range-row" for="productY">
+                  <span>Y</span>
+                  <input id="productY" type="range" min="-360" max="360" value="70" />
+                  <output id="productYValue" for="productY">70px</output>
+                </label>
+              </div>
+
+              <label class="toggle-row" for="productShadow">
+                <span>Shadow</span>
+                <input id="productShadow" type="checkbox" checked />
+              </label>
+            </section>
+
+            <section class="panel-section">
+              <div class="section-head">
+                <h2>Overlay</h2>
+              </div>
+              <div
+                class="overlay-list"
+                id="generateOverlayList"
+                aria-label="Generate selector overlay options"
+              ></div>
+            </section>
+          </div>
+
+          <div class="mode-panel" data-mode-panel="overlay">
+            <section class="panel-section">
+              <div class="section-head">
+                <h2>Image</h2>
+              </div>
+
+              <label class="drop-zone" id="overlayDropZone">
+                <input
+                  id="overlayInput"
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                />
+                <span class="drop-icon" data-lucide="upload-cloud" aria-hidden="true"></span>
+                <span class="drop-title">Upload image</span>
+                <span class="drop-subtitle">PNG, JPEG, WebP</span>
+              </label>
+
+              <p class="file-meta" id="overlayMeta">No image selected</p>
+            </section>
+
+            <section class="panel-section">
+              <div class="section-head">
+                <h2>Overlay</h2>
+              </div>
+              <div class="overlay-list" id="overlayList" aria-label="Overlay options"></div>
+            </section>
+
+            <section class="panel-section">
+              <div class="section-head">
+                <h2>Frame</h2>
+              </div>
+              <div class="segmented" role="group" aria-label="Image fit">
+                <button class="segment is-active" type="button" data-fit="cover">Crop fill</button>
+                <button class="segment" type="button" data-fit="contain">Fit full</button>
+              </div>
+            </section>
+          </div>
 
           <section class="panel-section">
             <div class="section-head">

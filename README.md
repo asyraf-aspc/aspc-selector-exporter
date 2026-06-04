@@ -1,14 +1,19 @@
 # ASPC Selector Exporter
 
-A static web app for uploading product images, applying built-in ASPC selector overlays, previewing the final 1080 x 1080 px output, and exporting as PNG or WebP.
+A static web app for generating ASPC selector thumbnails, applying built-in selector overlays, previewing the final 1080 x 1080 px output, and exporting as PNG or WebP.
 
-The default overlay option is `NONE`, which exports the uploaded product image without any overlay.
+## Modes
+
+- `Generate Selector` - combine a 1080 x 1080 px background image with a clean product asset, adjust product scale and position, optionally apply an overlay, then export.
+- `Overlay Existing` - upload a completed product image, apply an optional overlay, then export.
+
+The default overlay option is `NONE`, which exports the generated or uploaded image without an overlay.
 
 ## Files
 
 - `index.html` - app shell
 - `styles.css` - responsive UI
-- `app.js` - upload, overlay canvas, preview, export
+- `app.js` - upload, canvas composition, preview, export
 - `PHOTOS TO BE UPDATED.webp` - overlay asset
 - `assets/fonts/eurostile.woff2` - Eurostile UI font
 - `assets/logos/aspc-logo-white.png` - header logo
