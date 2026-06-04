@@ -3,7 +3,7 @@ const DEFAULT_PRODUCT_PLACEMENT = {
   scale: 78,
   x: 0,
   y: 70,
-  shadow: true,
+  shadow: false,
 };
 
 const overlays = [
