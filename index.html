@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ASPC Selector Exporter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <img
+            class="brand-logo"
+            src="assets/logos/aspc-logo-white.png"
+            alt="AFTERSHOCK"
+          />
+          <div>
+            <p class="eyebrow">Selector Tool</p>
+            <h1>ASPC Selector Exporter</h1>
+          </div>
+        </div>
+        <div class="size-pill">1080 x 1080 px</div>
+      </header>
+
+      <section class="workspace">
+        <aside class="control-panel" aria-label="Editor controls">
+          <section class="panel-section">
+            <div class="section-head">
+              <h2>Image</h2>
+            </div>
+
+            <label class="drop-zone" id="dropZone">
+              <input
+                id="imageInput"
+                type="file"
+                accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+              />
+              <span class="drop-icon" data-lucide="upload-cloud" aria-hidden="true"></span>
+              <span class="drop-title">Upload image</span>
+              <span class="drop-subtitle">PNG, JPEG, WebP</span>
+            </label>
+
+            <p class="file-meta" id="fileMeta">No image selected</p>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-head">
+              <h2>Overlay</h2>
+            </div>
+            <div class="overlay-list" id="overlayList" aria-label="Overlay options"></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-head">
+              <h2>Frame</h2>
+            </div>
+            <div class="segmented" role="group" aria-label="Image fit">
+              <button class="segment is-active" type="button" data-fit="cover">Crop fill</button>
+              <button class="segment" type="button" data-fit="contain">Fit full</button>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-head">
+              <h2>Export</h2>
+            </div>
+
+            <label class="format-row" for="formatSelect">
+              <span>Format</span>
+              <select id="formatSelect">
+                <option value="image/png">PNG</option>
+                <option value="image/webp">WebP</option>
+              </select>
+            </label>
+
+            <button class="primary-action" id="downloadBtn" type="button" disabled>
+              <span data-lucide="download" aria-hidden="true"></span>
+              <span>Download</span>
+            </button>
+          </section>
+        </aside>
+
+        <section class="preview-panel" aria-label="Preview">
+          <div class="preview-toolbar">
+            <div>
+              <p class="eyebrow">Preview</p>
+              <h2 id="previewTitle">Ready</h2>
+            </div>
+            <button class="icon-button" id="resetBtn" type="button" title="Clear image" disabled>
+              <span data-lucide="rotate-ccw" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div class="canvas-wrap" id="canvasWrap">
+            <canvas
+              id="previewCanvas"
+              width="1080"
+              height="1080"
+              aria-label="Generated product image preview"
+            ></canvas>
+            <div class="empty-state" id="emptyState">
+              <span data-lucide="image-up" aria-hidden="true"></span>
+              <span>Upload image</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>
