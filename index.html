@@ -63,16 +63,41 @@
                 <h2>Background</h2>
               </div>
 
-              <label class="drop-zone drop-zone-compact" id="backgroundDropZone">
-                <input
-                  id="backgroundInput"
-                  type="file"
-                  accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
-                />
-                <span class="drop-icon" data-lucide="image-up" aria-hidden="true"></span>
-                <span class="drop-title">Upload background</span>
-                <span class="drop-subtitle">1080 x 1080 preferred</span>
-              </label>
+              <div class="source-switch" role="group" aria-label="Background source">
+                <button
+                  class="source-button is-active"
+                  type="button"
+                  data-background-source="preset"
+                >
+                  <span class="source-radio" aria-hidden="true"></span>
+                  <span>Preset Background</span>
+                </button>
+                <button class="source-button" type="button" data-background-source="upload">
+                  <span class="source-radio" aria-hidden="true"></span>
+                  <span>Upload Own</span>
+                </button>
+              </div>
+
+              <div class="source-panel is-active" data-background-panel="preset">
+                <div
+                  class="background-list"
+                  id="presetBackgroundList"
+                  aria-label="Preset background options"
+                ></div>
+              </div>
+
+              <div class="source-panel" data-background-panel="upload">
+                <label class="drop-zone drop-zone-compact" id="backgroundDropZone">
+                  <input
+                    id="backgroundInput"
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                  />
+                  <span class="drop-icon" data-lucide="image-up" aria-hidden="true"></span>
+                  <span class="drop-title">Upload background</span>
+                  <span class="drop-subtitle">1080 x 1080 preferred</span>
+                </label>
+              </div>
 
               <p class="file-meta" id="backgroundMeta">No background selected</p>
             </section>

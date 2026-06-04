@@ -19,11 +19,23 @@ const overlays = [
   },
 ];
 
+const presetBackgrounds = [
+  {
+    id: "eofy-selector-background",
+    name: "EOFY Selector Background",
+    src: "EOFY%20Selector%20Background.png",
+  },
+];
+
 const state = {
   mode: "generate",
   generate: {
     backgroundImage: null,
     backgroundFile: "",
+    backgroundSource: "preset",
+    selectedBackgroundId: presetBackgrounds[0].id,
+    uploadedBackgroundImage: null,
+    uploadedBackgroundFile: "",
     productImage: null,
     productFile: "",
     selectedOverlayId: overlays[0].id,
@@ -38,11 +50,14 @@ const state = {
 };
 
 const overlayCache = new Map();
+const backgroundCache = new Map();
 
 const els = {
   backgroundDropZone: document.querySelector("#backgroundDropZone"),
   backgroundInput: document.querySelector("#backgroundInput"),
   backgroundMeta: document.querySelector("#backgroundMeta"),
+  backgroundPanels: document.querySelectorAll("[data-background-panel]"),
+  backgroundSourceButtons: document.querySelectorAll("[data-background-source]"),
   canvas: document.querySelector("#previewCanvas"),
   canvasWrap: document.querySelector("#canvasWrap"),
   downloadBtn: document.querySelector("#downloadBtn"),
@@ -56,6 +71,7 @@ const els = {
   overlayList: document.querySelector("#overlayList"),
   overlayMeta: document.querySelector("#overlayMeta"),
   previewTitle: document.querySelector("#previewTitle"),
+  presetBackgroundList: document.querySelector("#presetBackgroundList"),
   productDropZone: document.querySelector("#productDropZone"),
   productInput: document.querySelector("#productInput"),
   productMeta: document.querySelector("#productMeta"),
@@ -75,9 +91,12 @@ const ctx = els.canvas.getContext("2d", { alpha: true });
 document.addEventListener("DOMContentLoaded", init);
 
 function init() {
+  renderPresetBackgroundOptions();
   renderOverlayOptions();
   bindEvents();
   syncProductControls();
+  setBackgroundSource(state.generate.backgroundSource);
+  loadSelectedPresetBackground();
   setMode(state.mode);
 
   if (window.lucide) {
@@ -97,6 +116,22 @@ function bindEvents() {
     handleGenerateFile("product", file),
   );
   bindImageUpload(els.overlayInput, els.overlayDropZone, handleOverlayFile);
+
+  els.backgroundSourceButtons.forEach((button) => {
+    button.addEventListener("click", () => setBackgroundSource(button.dataset.backgroundSource));
+  });
+
+  els.presetBackgroundList.addEventListener("click", async (event) => {
+    const option = event.target.closest("[data-background-id]");
+    if (!option) {
+      return;
+    }
+
+    state.generate.selectedBackgroundId = option.dataset.backgroundId;
+    setBackgroundSource("preset");
+    updatePresetBackgroundActiveState();
+    await loadSelectedPresetBackground();
+  });
 
   bindOverlayOptions(els.generateOverlayList, "generate");
   bindOverlayOptions(els.overlayList, "overlay");
@@ -181,6 +216,113 @@ function bindImageUpload(input, dropZone, handler) {
   });
 }
 
+function renderPresetBackgroundOptions() {
+  els.presetBackgroundList.innerHTML = presetBackgrounds
+    .map(
+      (background) => `
+        <button
+          class="background-option${background.id === state.generate.selectedBackgroundId ? " is-active" : ""}"
+          type="button"
+          data-background-id="${background.id}"
+        >
+          <img class="background-thumb" src="${background.src}" alt="" />
+          <span class="background-name">${background.name}</span>
+          <span class="overlay-check" data-lucide="check" aria-hidden="true"></span>
+        </button>
+      `,
+    )
+    .join("");
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+function updatePresetBackgroundActiveState() {
+  document.querySelectorAll("[data-background-id]").forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.backgroundId === state.generate.selectedBackgroundId,
+    );
+  });
+}
+
+function setBackgroundSource(source) {
+  state.generate.backgroundSource = source;
+
+  els.backgroundSourceButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.backgroundSource === source);
+  });
+
+  els.backgroundPanels.forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.backgroundPanel === source);
+  });
+
+  if (source === "preset") {
+    loadSelectedPresetBackground();
+    return;
+  }
+
+  state.generate.backgroundImage = state.generate.uploadedBackgroundImage;
+  state.generate.backgroundFile = state.generate.uploadedBackgroundFile;
+  els.backgroundMeta.classList.remove("is-error");
+  els.backgroundMeta.textContent = state.generate.uploadedBackgroundImage
+    ? formatImageMeta(state.generate.uploadedBackgroundFile, state.generate.uploadedBackgroundImage)
+    : "No uploaded background selected";
+  updateToolbar();
+  renderCanvas();
+}
+
+async function loadSelectedPresetBackground() {
+  const background = currentPresetBackground();
+  const expectedBackgroundId = background.id;
+
+  try {
+    const image = await ensurePresetBackgroundImage(background);
+
+    if (
+      state.generate.backgroundSource !== "preset" ||
+      state.generate.selectedBackgroundId !== expectedBackgroundId
+    ) {
+      return;
+    }
+
+    state.generate.backgroundImage = image;
+    state.generate.backgroundFile = background.name;
+    els.backgroundMeta.classList.remove("is-error");
+    els.backgroundMeta.textContent = `Preset: ${background.name} - ${image.naturalWidth} x ${image.naturalHeight}px`;
+    updateToolbar();
+    renderCanvas();
+  } catch (error) {
+    showMetaError(els.backgroundMeta, "Preset background could not be opened.");
+    console.error(error);
+  }
+}
+
+function ensurePresetBackgroundImage(background) {
+  const cached = backgroundCache.get(background.id);
+
+  if (cached) {
+    return Promise.resolve(cached);
+  }
+
+  const promise = loadImage(background.src).then((image) => {
+    backgroundCache.set(background.id, image);
+    return image;
+  });
+
+  backgroundCache.set(background.id, promise);
+  return promise;
+}
+
+function currentPresetBackground() {
+  return (
+    presetBackgrounds.find(
+      (background) => background.id === state.generate.selectedBackgroundId,
+    ) || presetBackgrounds[0]
+  );
+}
+
 function renderOverlayOptions() {
   els.generateOverlayList.innerHTML = overlayOptionsMarkup("generate");
   els.overlayList.innerHTML = overlayOptionsMarkup("overlay");
@@ -236,10 +378,13 @@ async function handleGenerateFile(kind, file) {
     const image = await loadImageFromFile(file);
 
     if (kind === "background") {
+      state.generate.uploadedBackgroundImage = image;
+      state.generate.uploadedBackgroundFile = file.name;
       state.generate.backgroundImage = image;
       state.generate.backgroundFile = file.name;
       els.backgroundMeta.textContent = formatImageMeta(file.name, image);
       els.backgroundMeta.classList.remove("is-error");
+      setBackgroundSource("upload");
     } else {
       state.generate.productImage = image;
       state.generate.productFile = file.name;
@@ -513,14 +658,19 @@ function clearActiveMode() {
   if (state.mode === "generate") {
     state.generate.backgroundImage = null;
     state.generate.backgroundFile = "";
+    state.generate.backgroundSource = "preset";
+    state.generate.selectedBackgroundId = presetBackgrounds[0].id;
+    state.generate.uploadedBackgroundImage = null;
+    state.generate.uploadedBackgroundFile = "";
     state.generate.productImage = null;
     state.generate.productFile = "";
     els.backgroundInput.value = "";
     els.productInput.value = "";
-    els.backgroundMeta.textContent = "No background selected";
     els.productMeta.textContent = "No product selected";
     els.backgroundMeta.classList.remove("is-error");
     els.productMeta.classList.remove("is-error");
+    updatePresetBackgroundActiveState();
+    setBackgroundSource("preset");
     resetProductPlacement();
   } else {
     state.overlay.sourceImage = null;

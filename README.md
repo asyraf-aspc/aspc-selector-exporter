@@ -8,6 +8,7 @@ A static web app for generating ASPC selector thumbnails, applying built-in sele
 - `Overlay Existing` - upload a completed product image, apply an optional overlay, then export.
 
 The default overlay option is `NONE`, which exports the generated or uploaded image without an overlay.
+The default selector background preset is `EOFY Selector Background`.
 
 ## Files
 
@@ -15,6 +16,7 @@ The default overlay option is `NONE`, which exports the generated or uploaded im
 - `styles.css` - responsive UI
 - `app.js` - upload, canvas composition, preview, export
 - `PHOTOS TO BE UPDATED.webp` - overlay asset
+- `EOFY Selector Background.png` - preset selector background
 - `assets/fonts/eurostile.woff2` - Eurostile UI font
 - `assets/logos/aspc-logo-white.png` - header logo
 - `assets/logos/aspc-logo-black.png` - alternate logo

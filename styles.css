@@ -228,6 +228,131 @@ button:disabled {
   display: block;
 }
 
+.source-switch {
+  display: grid;
+  gap: 8px;
+}
+
+.source-button {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-raised);
+  color: var(--muted);
+  padding: 0 12px;
+  text-align: left;
+  font-family: var(--eurostile);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.source-button:hover,
+.source-button.is-active {
+  border-color: var(--accent-hot);
+  color: #ffffff;
+}
+
+.source-button.is-active {
+  background: var(--accent-soft);
+}
+
+.source-radio {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+}
+
+.source-radio::after {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  content: "";
+}
+
+.source-button.is-active .source-radio {
+  border-color: var(--accent-hot);
+}
+
+.source-button.is-active .source-radio::after {
+  background: var(--accent-hot);
+}
+
+.source-panel {
+  display: none;
+  margin-top: 12px;
+}
+
+.source-panel.is-active {
+  display: block;
+}
+
+.background-list {
+  display: grid;
+  gap: 10px;
+}
+
+.background-option {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-raised);
+  padding: 8px;
+  color: var(--text);
+  text-align: left;
+}
+
+.background-option:hover,
+.background-option.is-active {
+  border-color: var(--accent-hot);
+}
+
+.background-option.is-active {
+  background: var(--accent-soft);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.background-option.is-active .overlay-check {
+  border-color: var(--accent-hot);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.background-thumb {
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  object-fit: cover;
+  background: #121318;
+}
+
+.background-name {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--eurostile);
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
 .drop-zone {
   position: relative;
   display: grid;
