@@ -1,6 +1,6 @@
-# ASPC Selector Tool
+# ASPC Selector Exporter
 
-Static web app untuk upload gambar product, apply overlay stored dalam app, preview outcome 1080 x 1080 px, dan export sebagai PNG atau WebP.
+A static web app for uploading product images, applying built-in ASPC selector overlays, previewing the final 1080 x 1080 px output, and exporting as PNG or WebP.
 
 ## Files
 
@@ -14,7 +14,7 @@ Static web app untuk upload gambar product, apply overlay stored dalam app, prev
 
 ## Add More Overlays
 
-Letak fail overlay baru dalam folder yang sama, kemudian tambah item dalam array `overlays` di `app.js`:
+Place the new overlay file in the project folder, then add a new item to the `overlays` array in `app.js`:
 
 ```js
 {
@@ -24,12 +24,13 @@ Letak fail overlay baru dalam folder yang sama, kemudian tambah item dalam array
 }
 ```
 
-Overlay terbaik ialah 1080 x 1080 px dengan background transparent.
+For best results, use a 1080 x 1080 px overlay with a transparent background.
 
 ## GitHub Pages
 
-1. Push semua fail ke GitHub repo.
-2. Pergi ke `Settings` -> `Pages`.
-3. Set `Source` kepada branch repo, contohnya `main`.
-4. Set folder kepada `/root`.
-5. Save dan buka URL GitHub Pages yang GitHub bagi.
+1. Push all files to the GitHub repository.
+2. Go to `Settings` -> `Pages`.
+3. Set `Source` to `Deploy from a branch`.
+4. Set the branch to `main`.
+5. Set the folder to `/ (root)`.
+6. Save and open the GitHub Pages URL once deployment is complete.
