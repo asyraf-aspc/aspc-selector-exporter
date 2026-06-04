@@ -2,6 +2,11 @@ const OUTPUT_SIZE = 1080;
 
 const overlays = [
   {
+    id: "none",
+    name: "NONE",
+    src: "",
+  },
+  {
     id: "photos-to-be-updated",
     name: "PHOTOS TO BE UPDATED",
     src: "PHOTOS%20TO%20BE%20UPDATED.webp",
@@ -110,17 +115,25 @@ function bindEvents() {
 function renderOverlayOptions() {
   els.overlayList.innerHTML = overlays
     .map(
-      (overlay) => `
-        <button
-          class="overlay-option${overlay.id === state.selectedOverlayId ? " is-active" : ""}"
-          type="button"
-          data-overlay-id="${overlay.id}"
-        >
-          <img class="overlay-thumb" src="${overlay.src}" alt="" />
-          <span class="overlay-name">${overlay.name}</span>
-          <span class="overlay-check" data-lucide="check" aria-hidden="true"></span>
-        </button>
-      `,
+      (overlay) => {
+        const thumbnail = hasOverlayImage(overlay)
+          ? `<img class="overlay-thumb" src="${overlay.src}" alt="" />`
+          : `<span class="overlay-thumb overlay-thumb-none" aria-hidden="true">
+              <span data-lucide="ban"></span>
+            </span>`;
+
+        return `
+          <button
+            class="overlay-option${overlay.id === state.selectedOverlayId ? " is-active" : ""}"
+            type="button"
+            data-overlay-id="${overlay.id}"
+          >
+            ${thumbnail}
+            <span class="overlay-name">${overlay.name}</span>
+            <span class="overlay-check" data-lucide="check" aria-hidden="true"></span>
+          </button>
+        `;
+      },
     )
     .join("");
 
@@ -187,6 +200,10 @@ function loadImageFromFile(file) {
 }
 
 function ensureOverlayImage(overlay) {
+  if (!hasOverlayImage(overlay)) {
+    return Promise.resolve(null);
+  }
+
   const cached = overlayCache.get(overlay.id);
 
   if (cached) {
@@ -247,7 +264,13 @@ function drawSourceImage(image) {
 }
 
 function drawOverlayIfReady() {
-  const cached = overlayCache.get(currentOverlay().id);
+  const overlay = currentOverlay();
+
+  if (!hasOverlayImage(overlay)) {
+    return;
+  }
+
+  const cached = overlayCache.get(overlay.id);
 
   if (!cached || typeof cached.then === "function") {
     return;
@@ -258,6 +281,10 @@ function drawOverlayIfReady() {
 
 function currentOverlay() {
   return overlays.find((overlay) => overlay.id === state.selectedOverlayId) || overlays[0];
+}
+
+function hasOverlayImage(overlay) {
+  return Boolean(overlay?.src);
 }
 
 function showOverlayError(error) {

@@ -2,6 +2,8 @@
 
 A static web app for uploading product images, applying built-in ASPC selector overlays, previewing the final 1080 x 1080 px output, and exporting as PNG or WebP.
 
+The default overlay option is `NONE`, which exports the uploaded product image without any overlay.
+
 ## Files
 
 - `index.html` - app shell

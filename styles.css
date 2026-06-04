@@ -314,6 +314,22 @@ button:disabled {
   background-size: 12px 12px;
 }
 
+.overlay-thumb-none {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+.overlay-option.is-active .overlay-thumb-none {
+  color: var(--accent-hot);
+  border-color: var(--accent-hot);
+}
+
+.overlay-thumb-none svg {
+  width: 22px;
+  height: 22px;
+}
+
 .overlay-name {
   display: block;
   min-width: 0;
