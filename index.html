@@ -163,6 +163,21 @@
                 id="generateOverlayList"
                 aria-label="Generate selector overlay options"
               ></div>
+              <div class="custom-overlay-panel" id="generateCustomOverlayPanel">
+                <label class="drop-zone drop-zone-compact" id="generateCustomOverlayDropZone">
+                  <input
+                    id="generateCustomOverlayInput"
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                  />
+                  <span class="drop-icon" data-lucide="layers" aria-hidden="true"></span>
+                  <span class="drop-title">Upload custom overlay</span>
+                  <span class="drop-subtitle">Best with 1080 x 1080px</span>
+                </label>
+                <p class="file-meta" id="generateCustomOverlayMeta">
+                  No custom overlay selected
+                </p>
+              </div>
             </section>
           </div>
 
@@ -191,6 +206,21 @@
                 <h2>Overlay</h2>
               </div>
               <div class="overlay-list" id="overlayList" aria-label="Overlay options"></div>
+              <div class="custom-overlay-panel" id="overlayCustomOverlayPanel">
+                <label class="drop-zone drop-zone-compact" id="overlayCustomOverlayDropZone">
+                  <input
+                    id="overlayCustomOverlayInput"
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                  />
+                  <span class="drop-icon" data-lucide="layers" aria-hidden="true"></span>
+                  <span class="drop-title">Upload custom overlay</span>
+                  <span class="drop-subtitle">Best with 1080 x 1080px</span>
+                </label>
+                <p class="file-meta" id="overlayCustomOverlayMeta">
+                  No custom overlay selected
+                </p>
+              </div>
             </section>
 
             <section class="panel-section">

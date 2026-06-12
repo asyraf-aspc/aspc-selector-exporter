@@ -563,14 +563,31 @@ button:disabled {
   color: var(--muted);
 }
 
-.overlay-option.is-active .overlay-thumb-none {
+.overlay-thumb-custom {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+.overlay-option.is-active .overlay-thumb-none,
+.overlay-option.is-active .overlay-thumb-custom {
   color: var(--accent-hot);
   border-color: var(--accent-hot);
 }
 
-.overlay-thumb-none svg {
+.overlay-thumb-none svg,
+.overlay-thumb-custom svg {
   width: 22px;
   height: 22px;
+}
+
+.custom-overlay-panel {
+  display: none;
+  margin-top: 12px;
+}
+
+.custom-overlay-panel.is-active {
+  display: block;
 }
 
 .overlay-name {

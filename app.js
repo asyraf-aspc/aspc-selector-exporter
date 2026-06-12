@@ -1,4 +1,5 @@
 const OUTPUT_SIZE = 1080;
+const CUSTOM_OVERLAY_ID = "custom";
 const DEFAULT_PRODUCT_PLACEMENT = {
   scale: 78,
   x: 0,
@@ -16,6 +17,11 @@ const overlays = [
     id: "photos-to-be-updated",
     name: "PHOTOS TO BE UPDATED",
     src: "PHOTOS%20TO%20BE%20UPDATED.webp",
+  },
+  {
+    id: CUSTOM_OVERLAY_ID,
+    name: "CUSTOM UPLOAD",
+    custom: true,
   },
 ];
 
@@ -39,12 +45,16 @@ const state = {
     productImage: null,
     productFile: "",
     selectedOverlayId: overlays[0].id,
+    customOverlayImage: null,
+    customOverlayFile: "",
     ...DEFAULT_PRODUCT_PLACEMENT,
   },
   overlay: {
     sourceImage: null,
     sourceFile: "",
     selectedOverlayId: overlays[0].id,
+    customOverlayImage: null,
+    customOverlayFile: "",
     fitMode: "cover",
   },
 };
@@ -63,9 +73,17 @@ const els = {
   downloadBtn: document.querySelector("#downloadBtn"),
   emptyState: document.querySelector("#emptyState"),
   formatSelect: document.querySelector("#formatSelect"),
+  generateCustomOverlayDropZone: document.querySelector("#generateCustomOverlayDropZone"),
+  generateCustomOverlayInput: document.querySelector("#generateCustomOverlayInput"),
+  generateCustomOverlayMeta: document.querySelector("#generateCustomOverlayMeta"),
+  generateCustomOverlayPanel: document.querySelector("#generateCustomOverlayPanel"),
   generateOverlayList: document.querySelector("#generateOverlayList"),
   modePanels: document.querySelectorAll("[data-mode-panel]"),
   modeTabs: document.querySelectorAll("[data-mode]"),
+  overlayCustomOverlayDropZone: document.querySelector("#overlayCustomOverlayDropZone"),
+  overlayCustomOverlayInput: document.querySelector("#overlayCustomOverlayInput"),
+  overlayCustomOverlayMeta: document.querySelector("#overlayCustomOverlayMeta"),
+  overlayCustomOverlayPanel: document.querySelector("#overlayCustomOverlayPanel"),
   overlayDropZone: document.querySelector("#overlayDropZone"),
   overlayInput: document.querySelector("#overlayInput"),
   overlayList: document.querySelector("#overlayList"),
@@ -116,6 +134,16 @@ function bindEvents() {
     handleGenerateFile("product", file),
   );
   bindImageUpload(els.overlayInput, els.overlayDropZone, handleOverlayFile);
+  bindImageUpload(
+    els.generateCustomOverlayInput,
+    els.generateCustomOverlayDropZone,
+    (file) => handleCustomOverlayFile("generate", file),
+  );
+  bindImageUpload(
+    els.overlayCustomOverlayInput,
+    els.overlayCustomOverlayDropZone,
+    (file) => handleCustomOverlayFile("overlay", file),
+  );
 
   els.backgroundSourceButtons.forEach((button) => {
     button.addEventListener("click", () => setBackgroundSource(button.dataset.backgroundSource));
@@ -175,10 +203,11 @@ function bindOverlayOptions(list, scope) {
 
     state[scope].selectedOverlayId = option.dataset.overlayId;
     updateOverlayActiveState(scope);
+    syncCustomOverlayPanel(scope);
     updateToolbar();
 
     try {
-      await ensureOverlayImage(currentOverlay(scope));
+      await ensureOverlayImage(currentOverlay(scope), scope);
       renderCanvas();
     } catch (error) {
       showOverlayError(error);
@@ -335,11 +364,7 @@ function renderOverlayOptions() {
 function overlayOptionsMarkup(scope) {
   return overlays
     .map((overlay) => {
-      const thumbnail = hasOverlayImage(overlay)
-        ? `<img class="overlay-thumb" src="${overlay.src}" alt="" />`
-        : `<span class="overlay-thumb overlay-thumb-none" aria-hidden="true">
-            <span data-lucide="ban"></span>
-          </span>`;
+      const thumbnail = overlayThumbnailMarkup(overlay);
 
       return `
         <button
@@ -357,6 +382,22 @@ function overlayOptionsMarkup(scope) {
     .join("");
 }
 
+function overlayThumbnailMarkup(overlay) {
+  if (overlay.custom) {
+    return `<span class="overlay-thumb overlay-thumb-custom" aria-hidden="true">
+      <span data-lucide="upload"></span>
+    </span>`;
+  }
+
+  if (hasBuiltInOverlayImage(overlay)) {
+    return `<img class="overlay-thumb" src="${overlay.src}" alt="" />`;
+  }
+
+  return `<span class="overlay-thumb overlay-thumb-none" aria-hidden="true">
+    <span data-lucide="ban"></span>
+  </span>`;
+}
+
 function updateOverlayActiveState(scope) {
   document.querySelectorAll(`[data-overlay-scope="${scope}"]`).forEach((button) => {
     button.classList.toggle(
@@ -364,6 +405,31 @@ function updateOverlayActiveState(scope) {
       button.dataset.overlayId === state[scope].selectedOverlayId,
     );
   });
+}
+
+function syncCustomOverlayPanel(scope) {
+  customOverlayPanel(scope).classList.toggle(
+    "is-active",
+    state[scope].selectedOverlayId === CUSTOM_OVERLAY_ID,
+  );
+}
+
+function customOverlayPanel(scope) {
+  return scope === "generate"
+    ? els.generateCustomOverlayPanel
+    : els.overlayCustomOverlayPanel;
+}
+
+function customOverlayMeta(scope) {
+  return scope === "generate"
+    ? els.generateCustomOverlayMeta
+    : els.overlayCustomOverlayMeta;
+}
+
+function customOverlayInput(scope) {
+  return scope === "generate"
+    ? els.generateCustomOverlayInput
+    : els.overlayCustomOverlayInput;
 }
 
 async function handleGenerateFile(kind, file) {
@@ -412,11 +478,36 @@ async function handleOverlayFile(file) {
     state.overlay.sourceFile = file.name;
     els.overlayMeta.textContent = formatImageMeta(file.name, image);
     els.overlayMeta.classList.remove("is-error");
-    await ensureOverlayImage(currentOverlay("overlay"));
+    await ensureOverlayImage(currentOverlay("overlay"), "overlay");
     updateToolbar();
     renderCanvas();
   } catch (error) {
     showMetaError(els.overlayMeta, "Image could not be opened.");
+    console.error(error);
+  }
+}
+
+async function handleCustomOverlayFile(scope, file) {
+  const meta = customOverlayMeta(scope);
+
+  if (!isAcceptedImage(file)) {
+    showMetaError(meta, "Upload PNG, JPEG, or WebP only.");
+    return;
+  }
+
+  try {
+    const image = await loadImageFromFile(file);
+    state[scope].customOverlayImage = image;
+    state[scope].customOverlayFile = file.name;
+    state[scope].selectedOverlayId = CUSTOM_OVERLAY_ID;
+    meta.textContent = `${formatImageMeta(file.name, image)} - best with 1080 x 1080px`;
+    meta.classList.remove("is-error");
+    updateOverlayActiveState(scope);
+    syncCustomOverlayPanel(scope);
+    updateToolbar();
+    renderCanvas();
+  } catch (error) {
+    showMetaError(meta, "Custom overlay could not be opened.");
     console.error(error);
   }
 }
@@ -448,8 +539,12 @@ function loadImageFromFile(file) {
   });
 }
 
-function ensureOverlayImage(overlay) {
-  if (!hasOverlayImage(overlay)) {
+function ensureOverlayImage(overlay, scope = state.mode) {
+  if (overlay.custom) {
+    return Promise.resolve(state[scope].customOverlayImage);
+  }
+
+  if (!hasBuiltInOverlayImage(overlay)) {
     return Promise.resolve(null);
   }
 
@@ -518,7 +613,7 @@ function renderGeneratedSelector() {
   const hasProduct = Boolean(state.generate.productImage);
 
   els.canvasWrap.classList.toggle("has-image", hasBackground || hasProduct);
-  els.downloadBtn.disabled = !(hasBackground && hasProduct);
+  els.downloadBtn.disabled = !isScopeExportReady("generate");
 
   if (hasBackground) {
     drawImageFit(state.generate.backgroundImage, "cover");
@@ -535,7 +630,7 @@ function renderOverlayImage() {
   const hasImage = Boolean(state.overlay.sourceImage);
 
   els.canvasWrap.classList.toggle("has-image", hasImage);
-  els.downloadBtn.disabled = !hasImage;
+  els.downloadBtn.disabled = !isScopeExportReady("overlay");
 
   if (!hasImage) {
     return;
@@ -586,7 +681,14 @@ function drawProductAsset(image) {
 function drawOverlayIfReady(scope) {
   const overlay = currentOverlay(scope);
 
-  if (!hasOverlayImage(overlay)) {
+  if (overlay.custom) {
+    if (state[scope].customOverlayImage) {
+      ctx.drawImage(state[scope].customOverlayImage, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+    }
+    return;
+  }
+
+  if (!hasBuiltInOverlayImage(overlay)) {
     return;
   }
 
@@ -605,7 +707,7 @@ function currentOverlay(scope = state.mode) {
   );
 }
 
-function hasOverlayImage(overlay) {
+function hasBuiltInOverlayImage(overlay) {
   return Boolean(overlay?.src);
 }
 
@@ -654,6 +756,20 @@ function resetProductPlacement() {
   renderCanvas();
 }
 
+function clearCustomOverlay(scope) {
+  state[scope].customOverlayImage = null;
+  state[scope].customOverlayFile = "";
+  customOverlayInput(scope).value = "";
+  customOverlayMeta(scope).textContent = "No custom overlay selected";
+  customOverlayMeta(scope).classList.remove("is-error");
+
+  if (state[scope].selectedOverlayId === CUSTOM_OVERLAY_ID) {
+    state[scope].selectedOverlayId = overlays[0].id;
+    updateOverlayActiveState(scope);
+    syncCustomOverlayPanel(scope);
+  }
+}
+
 function clearActiveMode() {
   if (state.mode === "generate") {
     state.generate.backgroundImage = null;
@@ -669,6 +785,7 @@ function clearActiveMode() {
     els.productMeta.textContent = "No product selected";
     els.backgroundMeta.classList.remove("is-error");
     els.productMeta.classList.remove("is-error");
+    clearCustomOverlay("generate");
     updatePresetBackgroundActiveState();
     setBackgroundSource("preset");
     resetProductPlacement();
@@ -678,6 +795,7 @@ function clearActiveMode() {
     els.overlayInput.value = "";
     els.overlayMeta.textContent = "No image selected";
     els.overlayMeta.classList.remove("is-error");
+    clearCustomOverlay("overlay");
   }
 
   updateToolbar();
@@ -692,7 +810,7 @@ async function downloadImage() {
   els.downloadBtn.disabled = true;
 
   try {
-    await ensureOverlayImage(currentOverlay(state.mode));
+    await ensureOverlayImage(currentOverlay(state.mode), state.mode);
   } catch (error) {
     showOverlayError(error);
     els.downloadBtn.disabled = false;
@@ -727,11 +845,24 @@ async function downloadImage() {
 }
 
 function isExportReady() {
-  if (state.mode === "generate") {
-    return Boolean(state.generate.backgroundImage && state.generate.productImage);
+  return isScopeExportReady(state.mode);
+}
+
+function isScopeExportReady(scope) {
+  const hasBaseImage =
+    scope === "generate"
+      ? Boolean(state.generate.backgroundImage && state.generate.productImage)
+      : Boolean(state.overlay.sourceImage);
+
+  if (!hasBaseImage) {
+    return false;
   }
 
-  return Boolean(state.overlay.sourceImage);
+  if (currentOverlay(scope).custom) {
+    return Boolean(state[scope].customOverlayImage);
+  }
+
+  return true;
 }
 
 function exportBaseName() {

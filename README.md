@@ -8,6 +8,7 @@ A static web app for generating ASPC selector thumbnails, applying built-in sele
 - `Overlay Existing` - upload a completed product image, apply an optional overlay, then export.
 
 The default overlay option is `NONE`, which exports the generated or uploaded image without an overlay.
+Users can also choose `CUSTOM UPLOAD` to upload their own overlay. Custom overlays work best at 1080 x 1080 px.
 The default selector background preset is `EOFY Selector Background`.
 
 ## Files
